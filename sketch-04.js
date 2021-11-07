@@ -15,6 +15,9 @@ const params = {
   scaleMax: 30,
   freq: 0.001,
   amp: 0.2,
+  frame: 0,
+  animate: true,
+  lineCap: 'butt',
 };
 
 const sketch = () => {
@@ -42,8 +45,13 @@ const sketch = () => {
       const w = cellw * 0.8;
       const h = cellh * 0.8;
 
-      const n = random.noise2D(x + frame * 20, y, params.freq);
-      const angle = n * Math.PI * 0.2;
+
+      const f = params.animate ? frame : params.frame;
+
+      //const n = random.noise2D(x + frame * 20, y, params.freq);
+      const n = random.noise3D(x, y, f * 20, params.freq);
+
+      const angle = n * Math.PI * params.amp;
       //const scale = (n + 1) / 2 * 30;
       //const scale = (n * 0.5 + 0.5) * 30;
       const scale = math.mapRange(n, -1, 1, params.scaleMin, params.scaleMax);
@@ -55,6 +63,7 @@ const sketch = () => {
       context.rotate(angle);
 
       context.lineWidth = scale;
+      context.lineCap = params.lineCap;
 
       context.beginPath();
       context.moveTo(w * -0.5, 0);
@@ -74,6 +83,7 @@ const createPane = () => {
   let folder;
 
   folder = pane.addFolder({title: 'Grid'});
+  folder.addInput(params, 'lineCap', { options: { butt: 'butt', round: 'round', square: 'square' }});
   folder.addInput(params, 'cols', { min: 2, max: 50, step: 1});
   folder.addInput(params, 'rows', { min: 2, max: 50, step: 1});
   folder.addInput(params, 'scaleMin', { min: 1, max: 100 });
@@ -82,6 +92,8 @@ const createPane = () => {
   folder = pane.addFolder({ title: 'Noise' });
   folder.addInput(params, 'freq', { min: -0.01, max: 0.01 });
   folder.addInput(params, 'amp', { min: 0, max: 1 });
+  folder.addInput(params, 'animate');
+  folder.addInput(params, 'frame', { min: 0, max: 999 });
 };
 
 createPane();
